@@ -1,0 +1,28 @@
+<temp>
+  content  
+</temp>
+<level1>
+  <level2>
+    <level3>
+      level 3 content goes here
+    </level3>
+  </level2>
+</level1>
+<? single line comment ?>
+<?
+  <multi>
+    line comment
+  </multi>
+?>
+<!-- single line comment -->
+<!--
+  <multi>
+    line comment
+  </multi>
+-->
+<temp2 attr=value>
+    content2
+</temp2>
+<outer>
+  <inner>  inner content  </inner>
+</outer>
