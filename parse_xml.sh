@@ -119,22 +119,40 @@ EOF
     return 1
   fi
 
-  print_map "$CURR_TAG_MAP"
+  echo "$CURR_TAG_MAP"
 
   return 0
 }
 
-__OPT_LIGHT=false
-__OPT_FORCE_PRINT=false
-__OPT_XAPPLY=false
-__GET_CONTENT=false
+_OPT_PRINT="0"
+_OPT_HELP="0"
 
-USAGE="${FUNCNAME} [-clp] [-x command <-a attribute>] <file.xml> [tag | \"any\"] [attributes .. | \"content\"]
-  -c = NOCOLOR
-  -l = LIGHT (no \"attributes\" printed)
-  -p = FORCE PRINT (when no attributes given)
-  -x apply a command on an attribute and print the result instead of the former value
-  (no attribute given will load their values into your shell; use '-p' to print them as well"
+USAGE="${0} [-p] <file.xml>
+  -p = PRINT"
 
-FILE_CONTENT="$(sed ':a;N;$!ba;s/\n//g' "test.xml" | sed 's/</\n/g')"
-echo "${FILE_CONTENT}" | parse_xml
+while getopts :ph _OPT 2>/dev/null; do
+  case ${_OPT} in
+    p) _OPT_PRINT="1" ;;
+    h) _OPT_HELP="1" ;;
+    *) _NOARGS="${_NOARGS}${_NOARGS+, }-${OPTARG}" ;;
+  esac
+done
+shift $((OPTIND - 1))
+
+[ "$_OPT_HELP" = "1" ] && echo "$USAGE" && exit 0
+
+if [ "$#" -ne 1 ]; then
+  echo "Error: Invalid Parameter. see -h for usage"
+  exit 1
+fi
+
+FILE="$1"
+! [ -f "$FILE" ] && echo "Error: File doesn't exist." && exit 1
+FILE_CONTENT="$(sed ':a;N;$!ba;s/\n//g' "$FILE" | sed 's/</\n/g')"
+PARSED="$(echo "${FILE_CONTENT}" | parse_xml)"
+if [ "$?" -ne 0 ]; then
+  echo "Error: Invalid XML"
+  exit 1
+fi
+
+[ "$_OPT_PRINT" = "1" ] && print_map "$PARSED"
