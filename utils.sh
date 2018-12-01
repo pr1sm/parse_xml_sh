@@ -3,7 +3,12 @@
 # Setup trap to remove all references
 if [ "$__util_trap_created" = "" ]; then
   __util_trap_created="1"
-  trap 'rm -rf /tmp/__ref_*' EXIT
+  [ -z "$TMPDIR" ] && TMPDIR="/tmp"
+  if [ "$(echo -n "$TMPDIR" | tail -c 1)" = "/" ]; then
+    trap "rm -rf ${TMPDIR}__ref_*" EXIT
+  else
+    trap "rm -rf ${TMPDIR}/__ref_*" EXIT
+  fi
 fi
 
 util_make_ref() {

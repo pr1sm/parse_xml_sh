@@ -12,7 +12,7 @@ if [ "$__map_prefix" = "" ]; then
   __map_prefix="$(basename -- "$0")"
 fi
 if [ "$__map_mapdir" = "" ]; then
-  __map_mapdir="$(mktemp -dt "__ref_${__map_prefix}XXXXX")"
+  __map_mapdir="$(mktemp -dt "__ref_${__map_prefix}.XXXXX")"
   # trap 'rm -rf /tmp/__ref_*' EXIT
 fi
 

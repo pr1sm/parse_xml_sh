@@ -124,11 +124,11 @@ EOF
   return 0
 }
 
-_OPT_PRINT="0"
-_OPT_HELP="0"
+_OPT_PRINT=""
+_OPT_HELP=""
 
 USAGE="${0} [-p] <file.xml>
-  -p = PRINT"
+  -p - Print summary"
 
 while getopts :ph _OPT 2>/dev/null; do
   case ${_OPT} in
@@ -139,7 +139,7 @@ while getopts :ph _OPT 2>/dev/null; do
 done
 shift $((OPTIND - 1))
 
-[ "$_OPT_HELP" = "1" ] && echo "$USAGE" && exit 0
+! [ -z "$_OPT_HELP" ] && echo "$USAGE" && exit 0
 
 if [ "$#" -ne 1 ]; then
   echo "Error: Invalid Parameter. see -h for usage"
@@ -148,11 +148,15 @@ fi
 
 FILE="$1"
 ! [ -f "$FILE" ] && echo "Error: File doesn't exist." && exit 1
-FILE_CONTENT="$(sed ':a;N;$!ba;s/\n//g' "$FILE" | sed 's/</\n/g')"
+# FILE_CONTENT="$(sed ':a;N;$!ba;s/\r\n//g' "$FILE" | sed 's/</\\n/g')"
+# This usage of sed is more portable...
+FILE_CONTENT="$(sed -e ':a' -e 'N' -e '$!ba' -e 's/\n/ /g' "$FILE" | tr '<' '\n')"
+
+
 PARSED="$(echo "${FILE_CONTENT}" | parse_xml)"
 if [ "$?" -ne 0 ]; then
   echo "Error: Invalid XML"
   exit 1
 fi
 
-[ "$_OPT_PRINT" = "1" ] && print_map "$PARSED"
+! [ -z "$_OPT_PRINT" ] && print_map "$PARSED"
